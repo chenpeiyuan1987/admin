@@ -13,34 +13,34 @@
 
     <div class="layui-layout layui-layout-admin">
         <!-- 头部区域 -->
-        <div class="layui-header">
+        <div id="admin-head" class="layui-header">
             <ul class="layui-nav layui-layout-left">
                 <li class="layui-nav-item" lay-unselect>
-                    <a href="javascript:;" layadmin-event="flexible" title="侧边伸缩">
-                        <i class="layui-icon layui-icon-shrink-right" id="LAY_app_flexible"></i>
+                    <a href="javascript:;" lay-event="flexible" title="伸缩">
+                        <i class="layui-icon layui-icon-shrink-right"></i>
                     </a>
                 </li>
                 <li class="layui-nav-item" lay-unselect>
-                    <a href="javascript:;" layadmin-event="refresh" title="刷新">
+                    <a href="javascript:;" lay-event="refresh" title="刷新">
                         <i class="layui-icon layui-icon-refresh-3"></i>
                     </a>
                 </li>
             </ul>
             <ul class="layui-nav layui-layout-right">
-                <li class="layui-nav-item" lay-unselect>
-                    <a lay-href="app/message/index.html" layadmin-event="message" lay-text="消息中心">
+                <li class="layui-nav-item" lay-unselect title="消息">
+                    <a lay-href="app/message/index.html" lay-event="message" lay-text="消息中心">
                         <i class="layui-icon layui-icon-notice"></i>  
                         <!-- 如果有新消息，则显示小圆点 -->
                         <span class="layui-badge-dot"></span>
                     </a>
                 </li>
-                <li class="layui-nav-item layui-hide-xs" lay-unselect>
-                    <a href="javascript:;" layadmin-event="note">
+                <li class="layui-nav-item layui-hide-xs" lay-unselect title="便签">
+                    <a href="javascript:;" lay-event="note">
                         <i class="layui-icon layui-icon-note"></i>
                     </a>
                 </li>
-                <li class="layui-nav-item layui-hide-xs" lay-unselect>
-                    <a href="javascript:;" layadmin-event="fullscreen">
+                <li class="layui-nav-item layui-hide-xs" lay-unselect title="全屏">
+                    <a href="javascript:;" lay-event="fullscreen">
                         <i class="layui-icon layui-icon-screen-full"></i>
                     </a>
                 </li>
@@ -52,20 +52,20 @@
                         <dd><a lay-href="set/user/info.html">基本资料</a></dd>
                         <dd><a lay-href="set/user/password.html">修改密码</a></dd>
                         <hr>
-                        <dd layadmin-event="logout" style="text-align: center;"><a>退出</a></dd>
+                        <dd lay-event="logout" style="text-align:center;"><a>退出</a></dd>
                     </dl>
                 </li>
             </ul>
         </div>
 
-        <!-- 左侧导航区域 -->
-        <div class="layui-side layui-side-menu">
+        <!-- 导航区域 -->
+        <div id="admin-menu" class="layui-side layui-side-menu">
             <div class="layui-side-scroll">
                 <div class="layui-logo" lay-href="home/console.html">
                     <span>项目管理</span>
                 </div>
 
-                <ul id="admin-menu" class="layui-nav layui-nav-tree" lay-filter="test">
+                <ul id="admin-menu-body" class="layui-nav layui-nav-tree" lay-filter="test">
                     <li data-name="home" class="layui-nav-item">
                         <a href="javascript:;" lay-tips="主页" lay-direction="2">
                             <i class="layui-icon layui-icon-home"></i>
@@ -116,23 +116,23 @@
             </div>
         </div>
 
-        <!-- 页面标签区域 -->
+        <!-- 标签区域 -->
         <div id="admin-tabs" class="layadmin-pagetabs">
             <div class="layui-icon layadmin-tabs-control layui-icon-prev" layadmin-event="leftPage"></div>
             <div class="layui-icon layadmin-tabs-control layui-icon-next" layadmin-event="rightPage"></div>
             <div class="layui-icon layadmin-tabs-control layui-icon-down">
-                <ul class="layui-nav layadmin-tabs-select" lay-filter="layadmin-pagetabs-nav">
-                <li class="layui-nav-item" lay-unselect>
-                    <a href="javascript:;"></a>
-                    <dl class="layui-nav-child layui-anim-fadein">
-                    <dd layadmin-event="closeThisTabs"><a href="javascript:;">关闭当前标签页</a></dd>
-                    <dd layadmin-event="closeOtherTabs"><a href="javascript:;">关闭其它标签页</a></dd>
-                    <dd layadmin-event="closeAllTabs"><a href="javascript:;">关闭全部标签页</a></dd>
-                    </dl>
-                </li>
+                <ul class="layui-nav layadmin-tabs-select" lay-filter="admin-navs">
+                    <li class="layui-nav-item" lay-unselect>
+                        <a href="javascript:;"></a>
+                        <dl class="layui-nav-child layui-anim-fadein">
+                            <dd lay-event="closeThisTabs"><a href="javascript:;">关闭当前标签页</a></dd>
+                            <dd lay-event="closeOtherTabs"><a href="javascript:;">关闭其它标签页</a></dd>
+                            <dd lay-event="closeAllTabs"><a href="javascript:;">关闭全部标签页</a></dd>
+                        </dl>
+                    </li>
                 </ul>
             </div>
-            <div class="layui-tab" lay-unauto lay-allowClose="true" lay-filter="layadmin-layout-tabs">
+            <div class="layui-tab" lay-unauto lay-allowClose="true" lay-filter="admin-tabs">
                 <ul class="layui-tab-title" id="admin-tabs-body">
                     <li lay-id="home/test.html" lay-attr="home/test.html" class="layui-this">
                         <i class="layui-icon layui-icon-home"></i>
@@ -141,7 +141,7 @@
             </div>
         </div>
 
-        <!-- 主体内容区域 -->
+        <!-- 内容区域 -->
         <div id="admin-body" class="layui-body">
             <div class="layadmin-tabsbody-item layui-show">
                 <iframe src="/html/test.html" frameborder="0" class="layadmin-iframe"></iframe>
@@ -150,23 +150,9 @@
     </div>
 
     <script src="/lib/layui/layui.js"></script>
+    <script src="/js/index.js"></script>
     <script>
         layui.use(['jquery'], function($) {
-            // var module = 'admin';
-            // layui.onevent(module, 'click(1)', function() {
-            //     console.log('click1', this, arguments);
-            // });
-            // layui.onevent(module, 'click(2)', function() {
-            //     console.log('click2', this, arguments);
-            // });
-            // layui.onevent(module, 'click(3)', function() {
-            //     console.log('click3', this, arguments);
-            // });
-
-            // setTimeout(function() {
-            //     layui.event(module, 'click({*})', 'a');
-            // }, 1000);
-
             var $win = $(window);
             console.log('$win', $win);
             console.log('$win.width()', $win.width());
@@ -174,6 +160,13 @@
             console.log('$menu', $menu);
             console.log('$menu.width()', $menu.width());
         });
+    </script>
+
+    <!-- 模版 -->
+    <script id="tabsBodyItemTpl" type="text/html">
+        <div class="layadmin-tabsbody-item layui-show">
+            <iframe src="{{d}}" frameborder="0" class="layadmin-iframe"></iframe>
+        </div>
     </script>
 </body>
 
