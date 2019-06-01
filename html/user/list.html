@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>用户</title>
+    <link rel="stylesheet" href="/lib/layui/css/layui.css">
+    <link rel="stylesheet" href="/css/admin.css">
+</head>
+
+<body>
+    <div class="layui-fluid">
+        <div class="layui-card">
+            <div class="layui-form layui-card-header layuiadmin-card-header-auto">
+                <div class="layui-form-item">
+                    <div class="layui-inline">
+                        <label class="layui-form-label">用户名</label>
+                        <div class="layui-input-inline">
+                            <input type="text" name="username" autocomplete="off" class="layui-input">
+                        </div>
+                    </div>
+                    <div class="layui-inline">
+                        <button class="layui-btn" lay-submit lay-filter="search">
+                            搜索
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="layui-card-body">
+                <table id="table" lay-filter="table"></table>  
+            </div>
+        </div>
+    </div>
+</body>
+
+<!-- 脚本 -->
+<script src="/lib/layui/layui.js"></script>
+<script src="/js/user.js"></script>
+
+<!-- 模版 -->
+<script type="text/html" id="toolbarTpl2">
+    <a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="update">编辑</a>
+    <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="delete">删除</a>
+</script>
+<script type="text/html" id="toolbarTpl1">
+    <a class="layui-btn layui-btn-sm" lay-event="delete">删除</a>
+    <a class="layui-btn layui-btn-sm" lay-event="insert">添加</a>
+    <a class="layui-btn layui-btn-sm adjust" lay-event="LAYTABLE_COLS">筛选</a>
+    <a class="layui-btn layui-btn-sm adjust" lay-event="LAYTABLE_EXPORT">导出</a>
+    <a class="layui-btn layui-btn-sm" lay-event="LAYTABLE_PRINT">打印</a>
+</script>
+</html>

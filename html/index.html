@@ -61,7 +61,7 @@
         <!-- 导航区域 -->
         <div id="admin-menu" class="layui-side layui-side-menu">
             <div class="layui-side-scroll">
-                <div class="layui-logo" lay-href="home/console.html">
+                <div class="layui-logo" lay-href="/html/test.html">
                     <span>项目管理</span>
                 </div>
 
@@ -72,43 +72,28 @@
                             <cite>主页</cite>
                         </a>
                         <dl class="layui-nav-child">
-                            <dd data-name="console" class="layui-this">
+                            <dd data-name="test" class="layui-this">
                                 <a lay-href="/html/test.html">测试</a>
-                            </dd>
-                            <dd data-name="console">
-                                <a lay-href="/html/home1.html">主页一</a>
-                            </dd>
-                            <dd data-name="console">
-                                <a lay-href="/html/home2.html">主页二</a>
                             </dd>
                         </dl>
                     </li>
-                    <li data-name="comp" class="layui-nav-item layui-nav-itemed">
-                        <a href="javascript:;" lay-tips="组件" lay-direction="2">
+                    <li data-name="main" class="layui-nav-item layui-nav-itemed">
+                        <a href="javascript:;" lay-tips="主要" lay-direction="2">
                             <i class="layui-icon layui-icon-component"></i>
-                            <cite>组件</cite>
+                            <cite>主要</cite>
                         </a>
                         <dl class="layui-nav-child">
-                            <dd data-name="grid" class="layui-nav-itemed">
-                                <a href="javascript:;">栅格</a>
-                                <dl class="layui-nav-child">
-                                    <dd data-name="list"><a lay-href="component/grid/list.html">等比例列表排列</a></dd>
-                                    <dd data-name="mobile"><a lay-href="component/grid/mobile.html">按移动端排列</a></dd>
-                                    <dd data-name="mobile-pc"><a lay-href="component/grid/mobile-pc.html">移动桌面端组合</a></dd>
-                                    <dd data-name="all"><a lay-href="component/grid/all.html">全端复杂组合</a></dd>
-                                    <dd data-name="stack"><a lay-href="component/grid/stack.html">低于桌面堆叠排列</a></dd>
-                                    <dd data-name="speed-dial"><a lay-href="component/grid/speed-dial.html">九宫格</a></dd>
-                                </dl>
+                            <dd data-name="user">
+                                <a lay-href="/html/user/list.html">用户</a>
                             </dd>
-                            <dd data-name="button">
-                                <a lay-href="component/button/index.html">按钮</a>
+                            <dd data-name="project">
+                                <a lay-href="/html/project/list.html">项目</a>
                             </dd>
-                            <dd data-name="form">
-                                <a href="javascript:;">表单</a>
-                                <dl class="layui-nav-child">
-                                    <dd><a lay-href="component/form/element.html">表单元素</a></dd>
-                                    <dd><a lay-href="component/form/group.html">表单组合</a></dd>
-                                </dl>
+                            <dd data-name="mission">
+                                <a lay-href="/html/mission/list.html">任务</a>
+                            </dd>
+                            <dd data-name="subItem">
+                                <a lay-href="/html/subItem/list.html">检查项</a>
                             </dd>
                         </dl>
                     </li>
@@ -118,8 +103,8 @@
 
         <!-- 标签区域 -->
         <div id="admin-tabs" class="layadmin-pagetabs">
-            <div class="layui-icon layadmin-tabs-control layui-icon-prev" layadmin-event="leftPage"></div>
-            <div class="layui-icon layadmin-tabs-control layui-icon-next" layadmin-event="rightPage"></div>
+            <div class="layui-icon layadmin-tabs-control layui-icon-prev" lay-event="leftPage"></div>
+            <div class="layui-icon layadmin-tabs-control layui-icon-next" lay-event="rightPage"></div>
             <div class="layui-icon layadmin-tabs-control layui-icon-down">
                 <ul class="layui-nav layadmin-tabs-select" lay-filter="admin-navs">
                     <li class="layui-nav-item" lay-unselect>
@@ -134,7 +119,7 @@
             </div>
             <div class="layui-tab" lay-unauto lay-allowClose="true" lay-filter="admin-tabs">
                 <ul class="layui-tab-title" id="admin-tabs-body">
-                    <li lay-id="home/test.html" lay-attr="home/test.html" class="layui-this">
+                    <li lay-id="/html/test.html" lay-attr="/html/test.html" class="layui-this">
                         <i class="layui-icon layui-icon-home"></i>
                     </li>
                 </ul>
@@ -152,13 +137,21 @@
     <script src="/lib/layui/layui.js"></script>
     <script src="/js/index.js"></script>
     <script>
-        layui.use(['jquery'], function($) {
-            var $win = $(window);
-            console.log('$win', $win);
-            console.log('$win.width()', $win.width());
-            var $menu = $('#admin-menu');
-            console.log('$menu', $menu);
-            console.log('$menu.width()', $menu.width());
+        layui.use(['jquery', 'laytpl'], function($, laytpl) {
+            // var $win = $(window);
+            // console.log('$win', $win);
+            // console.log('$win.width()', $win.width());
+            // var $menu = $('#admin-menu');
+            // console.log('$menu', $menu);
+            // console.log('$menu.width()', $menu.width());
+
+            // var tpl = $('#tabsPageItemTpl').html();
+            // var $dl = $('li[data-name="home"] dl');
+            // for(var i=1; i<=20; i++) {
+            //     $dl.append(laytpl(tpl).render(i));
+            // }
+
+            $('[lay-href="/html/user.html"]').click();
         });
     </script>
 
@@ -167,6 +160,11 @@
         <div class="layadmin-tabsbody-item layui-show">
             <iframe src="{{d}}" frameborder="0" class="layadmin-iframe"></iframe>
         </div>
+    </script>
+    <script id="tabsPageItemTpl" type="text/html">
+        <dd data-name="console">
+            <a lay-href="/html/test.html?{{d}}">测试{{d}}</a>
+        </dd>
     </script>
 </body>
 

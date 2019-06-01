@@ -1,4 +1,6 @@
-layui.use(['jquery', 'element', 'laytpl'], function($, element, laytpl) {
+layui.config({
+    base: '/js/modules/',
+}).use(['jquery', 'element', 'laytpl', 'log'], function($, element, laytpl, log) {
     var $body = $('body'),
         module = 'admin',
         tabsPage = {},
@@ -8,6 +10,7 @@ layui.use(['jquery', 'element', 'laytpl'], function($, element, laytpl) {
             tabsBody: '#admin-tabs-body',
             head: '#admin-head',
             menu: '#admin-menu',
+            menuBody: '#admin-menu-body',
         },
         clazz = {
             show: 'layui-show',
@@ -21,60 +24,6 @@ layui.use(['jquery', 'element', 'laytpl'], function($, element, laytpl) {
             tabs: 'admin-tabs',
             navs: 'admin-navs',
         };
-
-    /**
-     * 日志
-     */
-    var log = {
-
-        args: function(sign, list) {
-            var res = [sign];
-            for(var i=0; i<list.length; i++) {
-                res.push(list[i]);
-            }
-            return res;
-        },
-
-        todo: function(sign, list) {
-            var args = this.args(sign, list);
-            console.log.apply(null, args);
-        },
-
-        /**
-         * 追踪
-         */
-        trace: function() {
-            this.todo('[T]', arguments);
-        },
-
-        /**
-         * 调试
-         */
-        debug: function() {
-            this.todo('[D]', arguments);
-        },
-
-        /**
-         * 信息
-         */
-        info: function() {
-            this.todo('[I]', arguments);
-        },
-
-        /**
-         * 警告
-         */
-        warn: function() {
-            this.todo('[W]', arguments);
-        },
-
-        /**
-         * 错误
-         */
-        error: function() {
-            this.todo('[E]', arguments);
-        }
-    }
 
     /**
      * 主要逻辑
@@ -107,6 +56,7 @@ layui.use(['jquery', 'element', 'laytpl'], function($, element, laytpl) {
                 .addClass(clazz.show)
                 .siblings()
                 .removeClass(clazz.show);
+            event.rollPage('auto', index);
             layui.event.call(this, module, 'tabsPage({*})', param);
         },
 
@@ -252,25 +202,119 @@ layui.use(['jquery', 'element', 'laytpl'], function($, element, laytpl) {
         closeOtherTabs: function(type) {
             var sele = frame.tabsBody + '>li';
             if(type === 'all') {
-                $(sele + ":gt(0)").remove();
-                $(frame.body).find("." + clazz.tabsBodyItem + ":gt(0)").remove();
-                $(sele).eq(0).trigger("click");
+                $(frame.tabsBody).children('li:first')
+                    .trigger('click').siblings().remove();
+                $(frame.body).children("." + clazz.tabsBodyItem + ":gt(0)")
+                    .remove();
             }
             else {
-                var cls = 'marked-for-deletion';
+                var marked = 'marked-for-deletion';
                 $(sele).each(function(index, elem) {
                     if(index && index != tabsPage.index) {
-                        $(elem).addClass(cls);
-                        logic.tabsBody(index).addClass(cls);
+                        $(elem).addClass(marked);
+                        logic.tabsBody(index).addClass(marked);
                     }
                 });
-                $("." + cls).remove();
+                $("." + marked).remove();
             }
         },
 
+        /**
+         * 左移选项
+         */
+        leftPage: function() {
+            event.rollPage('left');
+        },
+
+        /**
+         * 右移选项
+         */
+        rightPage: function() {
+            event.rollPage();
+        },
+
+        /**
+         * 移动选项
+         */
+        rollPage: function(type, index) {
+            var $tabsBody = $(frame.tabsBody);
+            var $li = $tabsBody.children('li');
+            var width = $tabsBody.outerWidth();
+            var left = parseFloat($tabsBody.css('left'));
+
+            if(type === 'left') {
+                if(!left && left <= 0) {
+                    return;
+                }
+                var diff = -left - width;
+                $li.each(function(index, elem) {
+                    var $this = $(this),
+                        left = $this.position().left;
+                    if(left >= diff) {
+                        $tabsBody.css('left', -left);
+                        return false;
+                    }
+                });
+                return;
+            }
+            
+            if(type === 'auto') {
+                var $e = $li.eq(index);
+                if($e.length > 0) {
+                    var l = $e.position().left;
+                    if(l < -left) {
+                        $tabsBody.css('left', -l);
+                        return;
+                    }
+                    var r = l + $e.outerWidth();
+                    if(r >= (width - left)) {
+                        var diff = r - (width - left);
+                        $li.each(function(index, elem) {
+                            var $this = $(this),
+                                l = $this.position().left;
+                            if(l + left > diff) {
+                                $tabsBody.css('left', -l);
+                                return false;
+                            }
+                        });
+                    }
+                }
+                return;
+            }
+
+            $li.each(function(index, elem) {
+                var $this = $(this);
+                    right = $this.position().left + $this.outerWidth();
+                if(right >= width - left) {
+                    $tabsBody.css('left', -$this.position().left);
+                    return false;
+                }
+            });
+        }
     };
 
+    logic.on('tabsPage(setMenustatus)', function(param) {
+        var url = param.url,
+            $body = $(frame.menuBody),
+            handle = function($e) {
+                $e.each(function() {
+                    var $this = $(this),
+                        $dd = $this.children('.layui-nav-child').children('dd'),
+                        href = $this.children('*[lay-href]').attr('lay-href');
+                    if(href === url) {
+                        $this.addClass(clazz.this);
+                        return false;
+                    }
+                    handle($dd);
+                });
+            };
+        $body.find('.' + clazz.this).removeClass(clazz.this);
+        handle($body.children('li'));
+    });
+
     $body.on('click', '*[lay-href]', function() {
+        log.info('lay-href', this);
+
         var $this = $(this),
             href = $this.attr('lay-href'),
             text = $this.attr('lay-text') || $this.text();
@@ -278,31 +322,16 @@ layui.use(['jquery', 'element', 'laytpl'], function($, element, laytpl) {
         logic.openTabsPage(href, text);
     });
     $body.on('click', '*[lay-event]', function() {
-        console.log('lay-event', this);
+        log.info('lay-event', this);
 
         var $this = $(this);
         var name = $this.attr('lay-event');
         event[name] && event[name].call(this);
     });
-    // $body.on('click', '#admin-tabs-body>li', function() {
-    //     console.log('lay-tabs', this);
 
-    //     // var $this = $(this);
-    //     // var index = $this.index();
-    //     // tabsPage.type = 'tab';
-    //     // tabsPage.index = index;
-    //     // logic.alterTabsBody(index, {
-    //     //     url: $this.attr('lay-attr'),
-    //     // });
-    // });
-
-    // element.on('nav(' + filter.navs + ')', function($elem) {
-    //     log.info('nav', $elem, this);
-    //     var $ = $elem.parent();
-    //     a.removeClass(y); 
-    //     a.parent().removeClass(d);
-    // });
     element.on('tab(' + filter.tabs + ')', function(data) {
+        log.info('tab(' + filter.tabs + ')', data);
+
         var $this = $(this);
         var index = $this.index();
         tabsPage.type = 'tab';
@@ -312,190 +341,13 @@ layui.use(['jquery', 'element', 'laytpl'], function($, element, laytpl) {
         });
     });
     element.on('tabDelete(' + filter.tabs + ')', function(data) {
-        var $li = $(frame.tabsBody + ">li.layui-this");
+        log.info('tabDelete(' + filter.tabs + ')', data);
+
         if(data.index) {
             logic.tabsBody(data.index).remove();
-            logic.alterTabsBody($li.index(), {
-                url: $li.attr('lay-attr')
-            });
-            //logic.delResize();
         }
     });
 
-    /*
-    var $ = layui.jquery,
-        element = layui.element,
-        module = 'admin',
-        $body = $('body'),
-        //tabsPage = {},
-        $cont = $('#');
-        filter = {
-            tabs: 'admin-tabs',
-            menu: 'admin-menu',
-            navs: 'admin-navs',
-        },
-        selector = {
-            adminBody: '#admin-body',
-            adminHead: '#admin-head',
-            adminMenu: '#admin-menu',
-            adminMenuBody: '#admin-menu-body',
-            adminTabs: '#admin-tabs',
-            adminTabsBody: '#admin-tabs-body',
-            adminTabsBodyLi: '#admin-tabs-body>li',
-
-            show: 'layui-show',
-            hide: 'layui-hide',
-            this: 'layui-this',
-
-            tabsBodyItem: 'layadmin-tabsbody-item',
-        };
-
-    var main = {
-        tabsPage: {},
-
-        on: function(event, callback) {
-            return layui.onevent.call(
-                this, module, event, callback);
-        },
-
-        tabsBody: function(index) {
-            return $(selector.adminBody)
-                .find('.' + selector.tabsBodyItem)
-                .eq(index || 0);
-        },
-
-        tabsBodyChange: function(index, param) {
-            param = param || {};
-            this.tabsBody(index)
-                .addClass(selector.show)
-                .siblings()
-                .removeClass(selector.show);
-            events.rollPage('auto', index);
-            layui.event.call(this, module, 'tabsPage({*})', param);
-        },
-
-        closeThisTabs: function() {
-            var index = this.tabsPage.index;
-            if(index) {
-                $(selector.adminTabsBody)
-                    .eq(index).find(".layui-tab-close")
-                    .trigger("click")
-            }
-        },
-
-        openTabsPage: function(href, text) {
-            var found = false, 
-                //filter = 'admin-tabs',
-                tabsPage = this.tabsPage,
-                $li = $(selector.adminTabsBody + '>li'),
-                trim = href.replace(/(^http(s*):)|(\?[\s\S]*$)/g, "");
-    
-            $li.each(function(index) {
-                var $this = $(this),
-                    id = $this.attr("lay-id");
-                if(id === href) {
-                    found = true;
-                    tabsPage.index = index;
-                }
-            });
-    
-            text = text || "新标签页";
-    
-            if (!found) {
-                var html = [
-                    '<div class="layadmin-tabsbody-item layui-show">', 
-                    '<iframe src="' + href + '" frameborder="0" class="layadmin-iframe"></iframe>', 
-                    '</div>'
-                ];
-                $(selector.adminBody).append(html.join(''));
-                tabsPage.index = $li.length;
-                element.tabAdd(filter.tabs, {
-                    title: "<span>" + text + "</span>",
-                    id: href,
-                    attr: trim
-                });
-            }
-    
-            element.tabChange(filter.tabs, href),
-            main.tabsBodyChange(tabsPage.index, {
-                url: href,
-                text: text
-            })
-        },
-
-        resize: function() {
-
-        },
-
-        delResize: function() {
-            //this.resize('off');
-        }
-    };
-
-    var event = {
-
-        rollPage: function(type, index) {
-            if('left' === type) {
-
-            }
-            else {
-                
-            }
-        },
-
-        closeThisTabs: function() {
-
-        },
-    };
-
-
-    // 系统事件
-    $body.on('click', '*[lay-href]', function() {
-        var $this = $(this),
-            href = $this.attr('lay-href'),
-            text = $this.attr('lay-text');
-        main.tabsPage.elem = $this;
-        main.openTabsPage(href, text || $this.text());
-    });
-    $body.on('click', selector.adminTabsBodyLi, function() {
-        var $this = $(this)
-            index = $this.index();
-        main.tabsPage.type = 'tab';
-        main.tabsPage.index = index;
-        main.tabsBodyChange($li.index(), {
-            url: $li.attr('lay-attr')
-        });
-    });
-    $body.on('click', '*[layadmin-event]', function() {
-        var $this = $(this);
-        var name = $this.attr('layadmin-event');
-        event[name] && event[name].call(this, $this);
-    });
-
-    element.on('nav(' + filter.menu + ')', function($elem) {
-        if($elem.siblings(".layui-nav-child")[0] && $cont.hasClass('layadmin-side-shrink')) {
-            main.sideFlexible("spread");
-            layer.close($elem.data("index"));
-            main.tabsPage.type = "nav";
-        }
-    });
-    element.on('nav(' + filter.navs + ')', function($elem) {
-        var a = $elem.parent();
-        a.removeClass(y); 
-        a.parent().removeClass(d);
-    });
-    element.on('tab(' + filter.tabs + ')', function(data) {
-        main.tabsPage.index = data.index;
-    });
-    element.on('tabDelete(' + filter.tabs + ')', function(data) {
-        var $li = $(selector.adminTabsBody + ">li.layui-this");
-        if(data.index) {
-            main.tabsBody(data.index).remove();
-            main.tabsBodyChange($li.index(), {
-                url: $li.attr('lay-attr')
-            });
-            main.delResize();
-        }
-    });
-*/
+    //
+    $('[lay-href="/html/user/list.html"]').click();
 });

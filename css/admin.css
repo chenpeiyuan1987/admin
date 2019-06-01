@@ -1404,3 +1404,20 @@ html {
         overflow: auto
     }
 }
+
+/**************************
+ *
+ */
+
+.layui-btn {
+    position: relative;
+}
+.layui-btn:hover {
+    opacity: 1;
+}
+.layui-btn .layui-table-tool-panel {
+    left: auto;
+    right: 0px;
+    top: 35px;
+    color: #666;
+}
